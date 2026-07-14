@@ -47,6 +47,11 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# Python virtual environment
 venv311/
 __pycache__/
 *.pyc
+
+# Tabpfn download (redownloaded automatically since large file)
+.tabpfn/
