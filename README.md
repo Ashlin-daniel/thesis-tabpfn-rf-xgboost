@@ -1,6 +1,6 @@
 # thesis-tabpfn-rf-xgboost
 Applications of TabFPN in microbiome research in R 
-TabPFN vs Random Forest vs XGBoost on Gut Microbiome Data
+# TabPFN vs Random Forest vs XGBoost on Gut Microbiome Data
 
 MSc thesis project comparing TabPFN, Random Forest, and XGBoost on predicting
 host Age, BMI, and Sex from gut microbiome composition, with a focus on how
