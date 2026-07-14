@@ -16,10 +16,20 @@ Repository structure
 
 
 ├── train_regression_latest.py                                # RF regression helper (Age, BMI)
+
+
 ├── metadata_Schirmer_2016_500FG_human_core_wide.tsv           # sample metadata
+
+
 ├── metaphlan4_Schirmer_2016_500FG_2026-06-25.tsv              # taxonomic abundance table
+
+
 ├── LICENSE
+
+
 └── README.md
+
+
 
 Everything the script needs sits in the same folder — no separate data/
 subfolder required.
