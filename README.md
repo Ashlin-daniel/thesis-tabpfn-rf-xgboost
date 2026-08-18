@@ -23,7 +23,6 @@ MSc thesis project comparing TabPFN, Random Forest, and XGBoost on predicting ho
 
 Everything the script needs sits in the same folder — no separate `data/` subfolder required.
 
-> **Note:** `real_data_sanity_check.R` is also currently in the repo. Check whether it's superseded by `sanitycheck_fake+real.R` (which already contains both the fully-synthetic and real-X checks) — if so, remove it so there's one canonical sanity-check script.
 
 ## Dataset
 
