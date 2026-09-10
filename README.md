@@ -6,6 +6,7 @@ TabPFN vs Random Forest vs XGBoost on Gut Microbiome Data
 
 MSc thesis project comparing TabPFN, Random Forest, and XGBoost on predicting host Age, BMI, and Sex from gut microbiome composition, with a focus on how each model's performance changes with training sample size.
 
+
 ## Repository structure
 
 ```
