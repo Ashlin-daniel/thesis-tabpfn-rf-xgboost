@@ -13,6 +13,8 @@ MSc thesis project comparing TabPFN, Random Forest, and XGBoost on predicting ho
 ├── schirmer_5foldCV.R              # main analysis: 5-fold CV, learning curves by sample size
 ├── schirmer_5foldCV+sig.R          # analysis: 5-fold CV, learning curves, significance testing, class significance
 ├── sanitycheck_fake+real.R         # validation: fully synthetic + real-X semi-synthetic ground-truth check
+├── sanitycheck_tabpfn.R            # validation: standalone TabPFN planted signal ground-truth check
+├── real_data_sanity_check.R        # validation: real data ground-truth check
 ├── real_permutation_check.R        # validation: permutation significance test (continuous + binned)
 ├── train_classifier.py             # TabPFN classifier helper (Sex)
 ├── train_regression_latest.py      # RF regression helper (Age, BMI)
