@@ -11,6 +11,8 @@ MSc thesis project comparing **TabPFN**, **Random Forest**, and **XGBoost** on p
 ├── schirmer5foldcv+sig.R             # MAIN SCRIPT: 5-fold CV, learning curves,
 │                                      # significance testing, cut-point classification
 ├── sanitycheck_fake+real.R           # validation: synthetic ground-truth recovery check
+├── permutation.R                     # validation: permutation test on synthetic data
+│                                      # (chance-distribution histogram vs. real R^2)
 ├── real_data_sanity_check.R          # validation: real-data extreme-groups check
 │                                      # (produces the AUC = 0.688 result cited in the thesis)
 ├── real_permutation_check.R          # significance testing: continuous + binned outcomes,
@@ -43,6 +45,7 @@ Schirmer 2016 500FG cohort, sourced from the [MetaLog database](https://microbio
 Two independent checks confirm that near-zero R² for Age/BMI prediction reflects genuine absence of signal, not a pipeline bug — this is validated *before* trusting the main results:
 
 - **`sanitycheck_fake+real.R`** — plants a known signal into fully synthetic compositional data and checks whether Random Forest, XGBoost, and TabPFN can recover it. Confirms the pipeline detects real signal when one is deliberately present.
+- **`permutation.R`** — formally tests this synthetic result via a permutation test: shuffles the synthetic data's labels 200 times to build a chance-only R² distribution, then compares the real R² against it (p = 0.005), with an accompanying histogram visualizing the result.
 - **`real_data_sanity_check.R`** — an extreme-groups comparison (youngest vs. oldest age quartile) using real, unmodified data, providing a real-data positive control independent of the synthetic check.
 
 ---
@@ -66,7 +69,7 @@ Two independent checks confirm that near-zero R² for Age/BMI prediction reflect
 ## How to run
 
 1. **`schirmer5foldcv+sig.R`** — main analysis: learning curves, 5-fold CV, significance testing, and cut-point classification across all 3 models × 3 tasks (Age, BMI, Sex)
-2. **`sanitycheck_fake+real.R`** and **`real_data_sanity_check.R`** — pipeline validation (ground-truth recovery checks)
+2. **`sanitycheck_fake+real.R`**, **`permutation.R`** and **`real_data_sanity_check.R`** — pipeline validation (ground-truth recovery checks and significance confirmation)
 3. **`real_permutation_check.R`** — full significance testing on the real results
 
 ---
