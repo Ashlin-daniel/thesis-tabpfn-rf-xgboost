@@ -1,23 +1,11 @@
 ## ============================================================
 ## SYNTHETIC DATA SANITY CHECK (FULL: fully-synthetic + semi-synthetic)
-## ============================================================
-## PURPOSE (plain language):
-## PART A (Steps 1-7): build FULLY FAKE microbiome data where WE decide,
-## in advance, that age has a real, strong relationship with a handful
-## of "taxa". Then run RF + XGBoost and check: can they find the planted
-## signal? This tests whether your CODE works at all.
-##
-## PART B (Step 8): use your REAL feature matrix, but inject a KNOWN
-## signal at a chosen strength (target R^2 = 0.7 down to 0.05). This
-## tests whether your pipeline can still detect signal once your
-## data's real structure (real taxa correlations, sparsity) is involved,
-## and finds your "detection floor" - the smallest true effect your
-## pipeline can still recover in this exact 471-sample cohort.
+
 ## ============================================================
 
-set.seed(42)  # so results are reproducible every time you run this
+set.seed(42)
 
-# install.packages("gtools")     # uncomment if you don't have this package
+# install.packages("gtools")    
 # install.packages("randomForest")
 # install.packages("caret")
 # install.packages("xgboost")
@@ -28,7 +16,7 @@ library(xgboost)
 
 
 ## ============================================================
-## PART A: FULLY SYNTHETIC CHECK (your original steps 1-7)
+## PART A: FULLY SYNTHETIC CHECK
 ## ============================================================
 
 ## ------------------------------------------------------------
@@ -52,7 +40,7 @@ comp_data <- rdirichlet(n_samples, alpha)  # n_samples x n_taxa, each row sums t
 colnames(comp_data) <- paste0("taxon_", 1:n_taxa)
 
 ## ------------------------------------------------------------
-## STEP 2: CLR transform (same as your real pipeline)
+## STEP 2: CLR transform 
 ## ------------------------------------------------------------
 ## CLR = Centered Log-Ratio. It's the standard way to handle compositional
 ## data so models don't get confused by the "sums to 100%" constraint.
@@ -196,118 +184,3 @@ cat("\nSaved synthetic_data_for_tabpfn_check.csv -- feed this into your\n")
 cat("existing TabPFN pipeline (age as target) as a third sanity check.\n\n")
 
 
-## ============================================================
-## PART B: SEMI-SYNTHETIC CHECK USING YOUR REAL X (Step 8)
-## ============================================================
-## PURPOSE (plain language):
-## Part A used FULLY fake X and y - it proves your code runs, but not
-## that it handles YOUR real data's specific structure (real taxa
-## correlations, sparsity, whatever quirks your actual 471x100 CLR
-## matrix has). This part keeps REAL X and only fakes the age label,
-## at a KNOWN, chosen R^2, to find your pipeline's detection floor.
-## ============================================================
-
-## ------------------------------------------------------------
-## Load your REAL, already CLR-transformed feature matrix
-## ------------------------------------------------------------
-## Replace this line with however you already load X in your real
-## pipeline (I don't have your actual file/object name).
-X_real <- read.csv("your_real_clr_data.csv")   # <-- REPLACE THIS LINE
-n_real <- nrow(X_real)
-
-## ------------------------------------------------------------
-## Inject a known signal into real X at a target R^2
-## ------------------------------------------------------------
-inject_known_signal <- function(X, target_r2, n_signal_taxa = 10, seed = NULL) {
-  if (!is.null(seed)) set.seed(seed)
-  
-  signal_idx <- sample(1:ncol(X), n_signal_taxa)
-  weights    <- runif(n_signal_taxa, min = -3, max = 3)
-  
-  signal <- as.matrix(X[, signal_idx]) %*% weights
-  signal <- as.vector(scale(signal))              # standardize to unit variance
-  
-  # R^2 = var(signal) / (var(signal) + var(noise)); var(signal)=1, so:
-  noise_sd <- sqrt(1 * (1 / target_r2 - 1))
-  noise    <- rnorm(nrow(X), mean = 0, sd = noise_sd)
-  
-  as.vector(signal + noise)
-}
-
-## ------------------------------------------------------------
-## Sweep across effect sizes, RF + XGBoost, same 5-fold CV as Part A
-## ------------------------------------------------------------
-effect_sizes <- c(0.7, 0.4, 0.2, 0.1, 0.05)
-semi_synth_results <- data.frame()
-
-for (r2_target in effect_sizes) {
-  
-  y_fake  <- inject_known_signal(X_real, target_r2 = r2_target, seed = 42)
-  df_fake <- as.data.frame(X_real)
-  df_fake$age <- y_fake
-  
-  folds_fake <- createFolds(df_fake$age, k = 5)
-  
-  ## Random Forest
-  rf_fold_r2 <- c()
-  for (i in seq_along(folds_fake)) {
-    test_idx  <- folds_fake[[i]]
-    train_idx <- setdiff(1:nrow(df_fake), test_idx)
-    rf_model  <- randomForest(age ~ ., data = df_fake[train_idx, ], ntree = 500)
-    preds     <- predict(rf_model, df_fake[test_idx, ])
-    ss_res <- sum((df_fake$age[test_idx] - preds)^2)
-    ss_tot <- sum((df_fake$age[test_idx] - mean(df_fake$age[test_idx]))^2)
-    rf_fold_r2 <- c(rf_fold_r2, 1 - ss_res / ss_tot)
-  }
-  rf_achieved <- mean(rf_fold_r2)
-  
-  ## XGBoost
-  xgb_fold_r2 <- c()
-  for (i in seq_along(folds_fake)) {
-    test_idx  <- folds_fake[[i]]
-    train_idx <- setdiff(1:nrow(df_fake), test_idx)
-    
-    train_x <- as.matrix(df_fake[train_idx, 1:ncol(X_real)])
-    train_y <- df_fake$age[train_idx]
-    test_x  <- as.matrix(df_fake[test_idx, 1:ncol(X_real)])
-    test_y  <- df_fake$age[test_idx]
-    
-    dtrain <- xgb.DMatrix(data = train_x, label = train_y)
-    dtest  <- xgb.DMatrix(data = test_x)
-    
-    xgb_model <- xgb.train(
-      params = list(objective = "reg:squarederror", max_depth = 4, eta = 0.1),
-      data = dtrain, nrounds = 200, verbose = 0
-    )
-    preds <- predict(xgb_model, dtest)
-    ss_res <- sum((test_y - preds)^2)
-    ss_tot <- sum((test_y - mean(test_y))^2)
-    xgb_fold_r2 <- c(xgb_fold_r2, 1 - ss_res / ss_tot)
-  }
-  xgb_achieved <- mean(xgb_fold_r2)
-  
-  cat(sprintf("Target R^2=%.2f -> RF achieved=%.3f, XGBoost achieved=%.3f\n",
-              r2_target, rf_achieved, xgb_achieved))
-  
-  semi_synth_results <- rbind(semi_synth_results,
-                              data.frame(target_r2 = r2_target, model = "rf",  achieved_r2 = rf_achieved),
-                              data.frame(target_r2 = r2_target, model = "xgb", achieved_r2 = xgb_achieved))
-}
-
-cat("\n")
-print(semi_synth_results)
-write.csv(semi_synth_results, "semi_synthetic_detection_floor.csv", row.names = FALSE)
-
-## ------------------------------------------------------------
-## NOTE ON TabPFN (same pattern as Part A)
-## ------------------------------------------------------------
-## Pick one target R^2 (e.g. ~0.1-0.2, closest to published values),
-## save that df_fake to CSV, and feed it into your EXISTING TabPFN
-## pipeline in place of real data - same reasoning as Part A's
-## write.csv(synthetic_data_for_tabpfn_check.csv) step.
-y_fake_for_tabpfn <- inject_known_signal(X_real, target_r2 = 0.2, seed = 42)
-df_fake_tabpfn <- as.data.frame(X_real)
-df_fake_tabpfn$age <- y_fake_for_tabpfn
-write.csv(df_fake_tabpfn, "semi_synthetic_data_for_tabpfn_check.csv", row.names = FALSE)
-cat("\nSaved semi_synthetic_data_for_tabpfn_check.csv (target R^2=0.2) -\n")
-cat("feed this into your existing TabPFN pipeline as a third check.\n")
