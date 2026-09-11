@@ -1,12 +1,6 @@
 ## ============================================================
 ## PERMUTATION TEST ON THE SYNTHETIC (KNOWN-SIGNAL) DATA
 ## ============================================================
-## PURPOSE: Earlier, we said "R^2 = 0.55-0.69 looks clearly non-zero,
-## so PASS." That was a rule-of-thumb eyeball check, not proof.
-## This script properly PROVES it, the same way we proved the real
-## data's null result -- by comparing against a shuffled-label
-## chance distribution.
-## ============================================================
 
 library(xgboost)
 
@@ -68,8 +62,7 @@ run_permutation_test <- function(X, y, model_fn, n_perm = 200, test_frac = 0.2, 
   list(real_r2 = real_r2, perm_r2 = perm_r2, p_value = p_value)
 }
 
-## ------------------------------------------------------------
-## RUN IT: load the synthetic data and test
+
 ## ------------------------------------------------------------
 synthetic_check_data <- read.csv("synthetic_data_for_tabpfn_check.csv")
 synthetic_check_data <- synthetic_check_data[complete.cases(synthetic_check_data), ]
