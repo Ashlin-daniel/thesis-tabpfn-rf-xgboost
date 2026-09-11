@@ -1,8 +1,6 @@
 ## ============================================================
 ## SIMPLE STANDALONE TabPFN SANITY CHECK
 ## ============================================================
-## This is separate from your real thesis script on purpose --
-## it won't touch or interfere with your real data or results.
 ## It only tests: "can TabPFN find an obvious, planted age signal?"
 ## (RF and XGBoost already passed this test, so this fills the gap.)
 ## ============================================================
@@ -18,7 +16,7 @@ py_run_string("import warnings; warnings.filterwarnings('ignore')")
 tabpfn_pkg <- import("tabpfn")
 
 ## ------------------------------------------------------------
-## Load ONLY the synthetic data -- nothing from your real pipeline
+## Loading ONLY the synthetic data 
 ## ------------------------------------------------------------
 synthetic_check_data <- read.csv(file.path(data_dir, "synthetic_data_for_tabpfn_check.csv"))
 synthetic_check_data <- synthetic_check_data[complete.cases(synthetic_check_data), ]
@@ -51,7 +49,7 @@ r2_score <- function(pred, truth) {
 }
 
 ## ------------------------------------------------------------
-## TabPFN regression via quantile binning (same method as your real script)
+## TabPFN regression via quantile binning 
 ## ------------------------------------------------------------
 run_tabpfn_reg <- function(X_train, y_train, X_test, y_test, n_bins = 10) {
   n_bins <- max(3, min(n_bins, floor(length(y_train) / 5)))
@@ -71,8 +69,7 @@ run_tabpfn_reg <- function(X_train, y_train, X_test, y_test, n_bins = 10) {
 }
 
 ## ------------------------------------------------------------
-## Simple single train/test split (80/20) -- no need for full 5-fold
-## just to sanity-check that TabPFN can find the signal at all
+## Simple single train/test split (80/20) 
 ## ------------------------------------------------------------
 set.seed(1)
 n         <- nrow(X)
