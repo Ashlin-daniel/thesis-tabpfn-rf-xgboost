@@ -1,9 +1,9 @@
 ## ============================================================
 ## REAL-DATA SANITY CHECKS (no simulated/fake data at all)
 ## ============================================================
-## Run this AFTER your main script's data loading section, so that
+## Run this AFTER the main script's data loading section, so that
 ## `X` (CLR-transformed real taxa) and `merged` (real metadata) already
-## exist in your R session.
+## exist in the R session.
 ## ============================================================
 
 r2_score <- function(pred, truth) {
