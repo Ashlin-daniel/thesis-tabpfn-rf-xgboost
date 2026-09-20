@@ -13,6 +13,7 @@ def train_regression(X_train, y_train, X_test, y_test):
 
     model = RandomForestRegressor(
         n_estimators=500,
+        max_features=1/3,
         random_state=42,
         n_jobs=-1
     )
@@ -23,7 +24,8 @@ def train_regression(X_train, y_train, X_test, y_test):
     return {
         "RMSE": float(np.sqrt(mean_squared_error(y_test, pred))),
         "MAE": float(mean_absolute_error(y_test, pred)),
-        "R2": float(r2_score(y_test, pred))
+        "R2": float(r2_score(y_test, pred)),
+        "pred": pred.tolist()
     }
 
 def train_regression_tabpfn(X_train, y_train, X_test, y_test):
