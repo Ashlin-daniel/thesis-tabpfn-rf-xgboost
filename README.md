@@ -59,7 +59,7 @@ Two independent checks confirm that near-zero R² for Age/BMI prediction reflect
 **`real_permutation_check.R`** — permutation-based significance testing on the real results: shuffles outcome labels to build a chance-only null distribution, applied to both continuous outcomes (Age, BMI R²) and binned outcomes (age decade, WHO BMI class), across all three models.
 
 Significance testing used a two-stage approach: an initial pass at lower
-permutation counts, followed by **merged_rerun.R`**, which
+permutation counts, followed by **merged_rerun.R**, which
 reruns any test whose real result exceeded every permuted attempt (i.e.,
 hit the resolution ceiling) at substantially higher permutation counts to
 obtain a definitive p-value. This script also applies Bonferroni and
