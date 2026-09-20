@@ -308,8 +308,6 @@ rf_clf_fn  <- function(X_train, y_train, X_test, y_test) {
   model <- randomForest(x = X_train, y = y_train_fac, ntree = 500)
   probs_matrix <- predict(model, X_test, type = "prob")
   if (!"1" %in% colnames(probs_matrix)) {
-    # this fold's shuffled training data contained only one class --
-    # the model has no basis to distinguish, so treat as uninformative
     probs <- rep(0.5, nrow(X_test))
   } else {
     probs <- probs_matrix[, "1"]
@@ -318,11 +316,10 @@ rf_clf_fn  <- function(X_train, y_train, X_test, y_test) {
 }
 
 tabpfn_reg_fn <- function(X_train, y_train, X_test, y_test) run_tabpfn_reg(X_train, y_train, X_test, y_test)
-# FIX: reuse the same direct TabPFN classifier function as Section 4 above,
-# instead of a separate, differently-implemented inline version
+
 tabpfn_clf_fn <- run_tabpfn_clf_direct
 
-cat("\nRunning CV-consistent significance tests (this will take a while)...\n")
+cat("\nRunning CV-consistent significance tests ..\n")
 sig_results_full <- list()
 sig_results_full$age_rf     <- run_cv_permutation_test(y_age, rf_reg_fn, n_perm = 40)
 sig_results_full$age_xgb    <- run_cv_permutation_test(y_age, xgb_reg_fn, n_perm = 40)
