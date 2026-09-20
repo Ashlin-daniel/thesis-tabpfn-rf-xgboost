@@ -10,12 +10,10 @@ MSc thesis project comparing **TabPFN**, **Random Forest**, and **XGBoost** on p
 .
 ├── schirmer5foldcv+sig.R             # MAIN SCRIPT: 5-fold CV, learning curves,
 │                                      # significance testing, cut-point classification
-├── final_resolution_complete.R       # reruns significance tests that hit the initial
+├── merged_rerun.R                      # reruns significance tests that hit the initial
 │                                      # resolution ceiling at higher permutation counts,
 │                                      # merges results, produces the final corrected
 │                                      # significance table reported in the thesis
-├── complete_plot_suite_polished.R    # generates all result figures (Tables 1, 2, 4,
-│                                      # 4a as plots, predicted-vs-observed, learning curves)
 ├── sanitycheck_fake+real.R           # validation: synthetic ground-truth recovery check
 ├── permutation.R                     # validation: permutation test on synthetic data
 │                                      # (chance-distribution histogram vs. real R^2)
@@ -61,7 +59,7 @@ Two independent checks confirm that near-zero R² for Age/BMI prediction reflect
 **`real_permutation_check.R`** — permutation-based significance testing on the real results: shuffles outcome labels to build a chance-only null distribution, applied to both continuous outcomes (Age, BMI R²) and binned outcomes (age decade, WHO BMI class), across all three models.
 
 Significance testing used a two-stage approach: an initial pass at lower
-permutation counts, followed by **`final_resolution_complete.R`**, which
+permutation counts, followed by **merged_rerun.R`**, which
 reruns any test whose real result exceeded every permuted attempt (i.e.,
 hit the resolution ceiling) at substantially higher permutation counts to
 obtain a definitive p-value. This script also applies Bonferroni and
@@ -85,8 +83,8 @@ producing the final corrected results reported in the thesis.
 1. **`schirmer5foldcv+sig.R`** — main analysis: learning curves, 5-fold CV, significance testing, and cut-point classification across all 3 models × 3 tasks (Age, BMI, Sex)
 2. **`sanitycheck_fake+real.R`**, **`permutation.R`**, and **`real_data_sanity_check.R`** — pipeline validation (ground-truth recovery checks and significance confirmation)
 3. **`real_permutation_check.R`** — full significance testing on the real results
-4. **`final_resolution_complete.R`** — resolves any test that hit the initial permutation-count ceiling, producing the final corrected significance table
-5. **`complete_plot_suite_polished.R`** — generates all result figures
+4. **`merged_rerun.R`** — resolves any test that hit the initial permutation-count ceiling, producing the final corrected significance table
+
 
 ---
 
